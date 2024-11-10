@@ -1,6 +1,6 @@
 import express from 'express';
 import UserController from '../../controllers/teacher/user.controller.js';
-import { validateStoreUser } from '../../validations/teacher/users.validation.js';
+import { validateStoreUser, validateUpdateUser } from '../../validations/teacher/user.validation.js';
 
 const userRouter = express.Router();
 const userController = new UserController();
@@ -13,27 +13,8 @@ userRouter.get(
 );
 
 userRouter.post('/', validateStoreUser, userController.store);
-
-userRouter.post(
-    '/login',
-    (req, res) => {
-        res.send('dang nhap')
-    }
-);
-
-userRouter.get(
-    '/profile',
-    (req, res) => {
-        res.send('profile')
-    }
-);
-
-userRouter.put(
-    '/profile',
-    (req, res) => {
-        res.send('update profile')
-    }
-);
+userRouter.put('/:userId', validateUpdateUser, userController.update);
+userRouter.get('/:userId', userController.find);
 
 userRouter.post(
     '/password/reset',

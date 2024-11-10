@@ -15,3 +15,15 @@ export const validateStoreUser = baseJoiValidate(
         })
     })
 )
+
+export const validateUpdateUser = baseJoiValidate(
+    Joi.object({
+        email: Joi.string().max(255).email(),
+        phone: Joi.string().max(11).min(4),
+        avatar: Joi.string().max(255),
+        gender: Joi.number(),
+        dateOfBirth: Joi.date().format('DD/MM/YYYY').messages({
+            "date.base": "Format khong dung"
+        })
+    })
+)
