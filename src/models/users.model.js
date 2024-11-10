@@ -18,10 +18,10 @@ const userSchema = new mongoose.Schema(
         },
         avatar: String,
         gender: {
-            type: String,
-            enum: ['male', 'female', 'other']
+            type: Number,
+            required: true
         },
-        dateOfBirth: Date,
+        dateOfBirth: String,
         role: {
             type: String,
             enum: ['user', 'admin'],
@@ -35,5 +35,4 @@ const userSchema = new mongoose.Schema(
     }
 );
 
-const User = mongoose.model('User' , userSchema);
-export {User};
+export const User = mongoose.model('User' , userSchema, 'users');

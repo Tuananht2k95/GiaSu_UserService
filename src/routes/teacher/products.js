@@ -1,61 +1,64 @@
 import express from 'express';
 
-const userRouter = express.Router();
-
-userRouter.get(
+const productRouter = express.Router();
+productRouter.use((req, res, next) => {
+    console.log('authen');
+    next();
+});
+productRouter.get(
     '/',
     (req, res) => {
-        res.send('Trang chu user')
+        res.send('Trang chu product')
     }
 );
 
-userRouter.post(
-    '/register',
+productRouter.post(
+    '/',
     (req, res) => {
         res.send('dang ky')
     }
 );
 
-userRouter.post(
+productRouter.post(
     '/login',
     (req, res) => {
         res.send('dang nhap')
     }
 );
 
-userRouter.get(
+productRouter.get(
     '/profile',
     (req, res) => {
         res.send('profile')
     }
 );
 
-userRouter.put(
+productRouter.put(
     '/profile',
     (req, res) => {
         res.send('update profile')
     }
 );
 
-userRouter.post(
+productRouter.post(
     '/password/reset',
     (req, res) => {
         res.send('reset pass')
     }
 );
 
-userRouter.get(
+productRouter.get(
     '/addresses',
     (req, res) => {
         res.send('dia chi')
     }
 );
 
-userRouter.post(
+productRouter.post(
     '/verify',
     (req, res) => {
         res.send('xac thuc')
     }
 );
 
-export default userRouter;
+export default productRouter;
