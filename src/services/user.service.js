@@ -50,6 +50,11 @@ class UserService {
         return await User.findByIdAndDelete(userId);
     }
 
+    async index() {
+        const users = await User.find();
+
+        return users;
+    }
 }
 
 export default UserService

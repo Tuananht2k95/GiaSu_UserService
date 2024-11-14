@@ -30,16 +30,27 @@ class UserController {
 
             return res.json(user)
         } catch (error) {
-            res.json(error.message)
+            return res.json(error.message)
         }
     };
 
     async delete(req, res) {
         try {
             const userService = new UserService();
+
             return res.json(await userService.delete(req.params.userId));
         } catch (error) {
-            res.json(error.message)
+            return res.json(error.message)
+        }
+    }
+
+    async index(req, res) {
+        try {
+            const userService = new UserService();
+
+            return res.json(await userService.index())
+        } catch (error) {
+            return res.json(error.message)
         }
     }
 }

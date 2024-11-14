@@ -5,23 +5,10 @@ import { validateStoreUser, validateUpdateUser } from '../../validations/teacher
 const userRouter = express.Router();
 const userController = new UserController();
 
-userRouter.get(
-    '/',
-    (req, res) => {
-        res.send('Trang chu user')
-    }
-);
-
 userRouter.post('/', validateStoreUser, userController.store);
 userRouter.put('/:userId', validateUpdateUser, userController.update);
 userRouter.get('/:userId', userController.find);
-
-userRouter.post(
-    '/password/reset',
-    (req, res) => {
-        res.send('reset pass')
-    }
-);
+userRouter.get('/', userController.index)
 
 userRouter.get(
     '/addresses',

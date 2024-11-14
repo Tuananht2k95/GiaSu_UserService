@@ -33,6 +33,17 @@ class UserController {
             res.json(error.message)
         }
     }
+
+    
+    async index(req, res) {
+        try {
+            const userService = new UserService();
+
+            return res.json(await userService.index())
+        } catch (error) {
+            return res.json(error.message)
+        }
+    }
 }
 
 export default UserController;
