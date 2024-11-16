@@ -24,7 +24,6 @@ class UserService {
     };
 
     async find(userId) {
-        console.log(userId);
         if (!isValidObjectId(userId)) {
             return 'User khong ton tai';
         }
@@ -50,11 +49,11 @@ class UserService {
         return await User.findByIdAndDelete(userId);
     }
 
-    async index() {
-        const users = await User.find();
-
-        return users;
+    async search(query) {
+        return await User.find(
+            {phone: { $regex: query.phone }}
+        )
     }
 }
 
-export default UserService
+export default UserService;

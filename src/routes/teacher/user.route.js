@@ -6,22 +6,8 @@ const userRouter = express.Router();
 const userController = new UserController();
 
 userRouter.post('/', validateStoreUser, userController.store);
+userRouter.get('/search', userController.search);
 userRouter.put('/:userId', validateUpdateUser, userController.update);
 userRouter.get('/:userId', userController.find);
-userRouter.get('/', userController.index)
-
-userRouter.get(
-    '/addresses',
-    (req, res) => {
-        res.send('dia chi')
-    }
-);
-
-userRouter.post(
-    '/verify',
-    (req, res) => {
-        res.send('xac thuc')
-    }
-);
 
 export default userRouter;

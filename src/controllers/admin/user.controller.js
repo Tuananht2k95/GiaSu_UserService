@@ -44,11 +44,11 @@ class UserController {
         }
     }
 
-    async index(req, res) {
+    async search(req, res) {
         try {
             const userService = new UserService();
 
-            return res.json(await userService.index())
+            return res.json(await userService.search(req.query))
         } catch (error) {
             return res.json(error.message)
         }

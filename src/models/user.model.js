@@ -2,6 +2,10 @@ import mongoose, { Schema } from "mongoose";
 
 const userSchema = new mongoose.Schema(
     {
+        name: {
+            type: String, 
+            required: true,
+        },
         email: {
             type: String,
             required: true,
@@ -19,13 +23,12 @@ const userSchema = new mongoose.Schema(
         avatar: String,
         gender: {
             type: Number,
-            required: true
+            required: true,
         },
         dateOfBirth: String,
         role: {
-            type: String,
-            enum: ['user', 'admin'],
-            default: 'user'
+            type: Number,
+            required: true,
         },
         status: {
             type: String,
@@ -35,4 +38,4 @@ const userSchema = new mongoose.Schema(
     }
 );
 
-export const User = mongoose.model('User' , userSchema, 'users');
+export const User = mongoose.model('User', userSchema, 'users');

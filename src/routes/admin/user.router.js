@@ -5,6 +5,7 @@ const userRouter = express.Router();
 const userController = new UserController();
 
 userRouter.get('/', (req,res) => {return res.json('admin/user test')});
+userRouter.get('/search', userController.search)
 userRouter.post('/', validateStoreUser, userController.store);
 userRouter.put('/:userId', validateUpdateUser, userController.update);
 userRouter.get('/:userId', userController.find);
