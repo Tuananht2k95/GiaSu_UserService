@@ -1,8 +1,9 @@
 import express from "express";
-import userRouter from "./users.js";
+import userRouter from "./teacher/user.route.js";
+import adminRouter from "./admin/index.js";
 
 const router = express.Router();
+router.use('/user', userRouter);
+router.use('/admin', adminRouter);
 
-router.use('/users', userRouter)
-
-export default router 
+export default router;
