@@ -1,41 +1,65 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
+import { USER } from "../config/constant.js";
 
-const userSchema = new mongoose.Schema(
-    {
-        name: {
-            type: String, 
-            required: true,
+const userSchema = new mongoose.Schema({
+    name: {
+        type: String, 
+        required: true,
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    phone: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    avatar: {
+        type: String,
+    },
+    gender: {
+        type: Number,
+        required: true,
+    },
+    dateOfBirth: {
+        type: String,
+    },
+    role: {
+        type: Number,
+        required: true,
+        enum: {
+            values: Object.values(USER.role)
         },
-        email: {
-            type: String,
-            required: true,
-            unique: true,
+        default: USER.role.teacher
+    },
+    levelTeacher: {
+        type: Number,
+        enum: {
+            values: Object.values(USER.levelTeacher)
         },
-        phone: {
-            type: String,
-            required: true,
-            unique: true,
+        default: USER.levelTeacher.tutor,
+        required: true,
+    },
+    currentWorkplace: {
+        type: String,
+    },
+    previousWorkplace: {
+        type: String,
+    },
+    status: {
+        type: Number,
+        required: true,
+        enum: {
+            values: Object.values(USER.status)
         },
-        password: {
-            type: String,
-            required: true,
-        },
-        avatar: String,
-        gender: {
-            type: Number,
-            required: true,
-        },
-        dateOfBirth: String,
-        role: {
-            type: Number,
-            required: true,
-        },
-        status: {
-            type: String,
-            enum: ['active', 'inactive', 'blocked'],
-            default: 'active'
-        },
-    }
-);
+        default: USER.status.inactive,
+    },
+});
 
 export const User = mongoose.model('User', userSchema, 'users');
