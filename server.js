@@ -6,5 +6,6 @@ connectMongoDB.then(
     () => {
         console.log('connect mongoDB successfully');
     }
-)
+);
 
+app;
