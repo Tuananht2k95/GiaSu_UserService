@@ -60,6 +60,9 @@ const userSchema = new mongoose.Schema({
         },
         default: USER.status.inactive,
     },
+    confirmationCode: {
+        type: Number,
+    }
 });
 
 export const User = mongoose.model('User', userSchema, 'users');

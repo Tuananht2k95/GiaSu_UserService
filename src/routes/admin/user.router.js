@@ -10,4 +10,5 @@ userRouter.post('/', validateStoreUser, userController.store);
 userRouter.put('/:userId', validateUpdateUser, userController.update);
 userRouter.get('/:userId', userController.find);
 userRouter.delete('/:userId', userController.delete);
+userRouter.post('/confirm-account', userController.confirmAccount)
 export default userRouter;

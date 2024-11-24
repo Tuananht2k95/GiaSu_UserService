@@ -1,16 +1,16 @@
 import { isValidObjectId } from "mongoose";
-import { signHmacSha256 } from "../helpers/helpers.js"
+import { signHmac } from "../helpers/helpers.js"
 import { User } from "../models/user.model.js";
 import EmailService from "./email.service.js";
-import { generateConfirmUrl } from "../helpers/helpers.js";
+import { generateConfirmUrl,generateConfirmationCode, parserJWTToken } from "../helpers/helpers.js";
 import { USER } from "../config/constant.js";
 
 class UserService {
     async store(data) {
-        data.password = signHmacSha256(data.password);
+        data.password = signHmac(data.password, 'sha256');
+        data.confirmationCode = generateConfirmationCode();
         const newUser = await User.create(data);
         const emailService = new EmailService();
-        console.log(emailService);
         
         emailService.sendEmail(
             [data.email], 
@@ -18,6 +18,7 @@ class UserService {
             '/emailConfirm/emailConfirm.ejs', 
             {
                 confirmUrl: generateConfirmUrl(newUser._id),
+                confirmationCode: data.confirmationCode,
             },
         );
         return newUser;
@@ -73,17 +74,21 @@ class UserService {
         }        
     }
 
-    async confirmAccount(userId, confirmationCode) {
-        const user = await User.findById(userId);
+    async confirmAccount(token, confirmationCode) {
+        const res = parserJWTToken(token);
+        const user = await User.findOne({_id: res._id});
         
         if (user == {}) {
             return "user khong ton tai"
         };
-
-        if (confirmationCode = user.confirmationCode) {
-            user.status = USER.status.active;
-            return 'user active thanh cong'
-        } else return 'code khong dung'
+        if (user.status == USER.status.active) {
+            return "user da xac thuc"
+        }
+        if (confirmationCode == user.confirmationCode) {
+            return user
+            // user.status = USER.status.active;
+            // return "user active thanh cong"
+        } else return "code khong dung"
     }
 }
 

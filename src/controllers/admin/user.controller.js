@@ -80,8 +80,8 @@ class UserController {
     async confirmAccount(req, res) {
         try {
             const userService = new UserService();
-
-            return res.json(userService.confirmAccount(req.userId, user.confirmationCode));
+            
+            return res.json(userService.confirmAccount(req.query.token, req.body.confirmationCode));
         } catch (error) {
             return res.json(error.message);
         }
