@@ -76,6 +76,16 @@ class UserController {
             return res.json(error.message)
         }
     }
+
+    async confirmAccount(req, res) {
+        try {
+            const userService = new UserService();
+
+            return res.json(userService.confirmAccount(req.userId, user.confirmationCode));
+        } catch (error) {
+            return res.json(error.message);
+        }
+    }
 }
 
 export default UserController;

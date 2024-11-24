@@ -3,6 +3,7 @@ import { signHmacSha256 } from "../helpers/helpers.js"
 import { User } from "../models/user.model.js";
 import EmailService from "./email.service.js";
 import { generateConfirmUrl } from "../helpers/helpers.js";
+import { USER } from "../config/constant.js";
 
 class UserService {
     async store(data) {
@@ -70,6 +71,19 @@ class UserService {
         return {
             data, total, pagination
         }        
+    }
+
+    async confirmAccount(userId, confirmationCode) {
+        const user = await User.findById(userId);
+        
+        if (user == {}) {
+            return "user khong ton tai"
+        };
+
+        if (confirmationCode = user.confirmationCode) {
+            user.status = USER.status.active;
+            return 'user active thanh cong'
+        } else return 'code khong dung'
     }
 }
 
