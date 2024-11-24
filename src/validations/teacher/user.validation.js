@@ -14,9 +14,8 @@ export const validateStoreUser = baseJoiValidate(
         dateOfBirth: Joi.date().format('DD/MM/YYYY').messages({
             "date.base": "Format khong dung"
         }),
-        role: Joi.number().required(),
     })
-)
+);
 
 export const validateUpdateUser = baseJoiValidate(
     Joi.object({
@@ -29,4 +28,14 @@ export const validateUpdateUser = baseJoiValidate(
             "date.base": "Format khong dung"
         })
     })
+);
+
+export const validateIndexUser = baseJoiValidate(
+    Joi.object({
+        limit: Joi.number().integer().min(1),
+        page: Joi.number().min(1),
+        keyword: Joi.string().max(255),
+        role: Joi.number().min(1).max(2),
+    }),
+    'query'
 )

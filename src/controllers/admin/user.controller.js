@@ -44,13 +44,46 @@ class UserController {
         }
     }
 
-    async search(req, res) {
+    async index(req, res) {
         try {
+            const {keyword, role, level, limit, page} = req.query;
+            const conditions = {};
+            const pagination = {}
+            if (keyword) {
+                conditions.$or = [
+                    {email: new RegExp(`${keyword}`, 'i')},
+                    {phone: new RegExp(`${keyword}`, 'i')},
+                    {name: new RegExp(`${keyword}`, 'i')},
+                ]
+            };
+            if (role) {
+                conditions.role = role
+            };
+            if (level) {
+                conditions.level = level
+            };
+            if (limit) {
+                pagination.limit = limit;
+            } else pagination.limit = 10;
+            if (page) {
+                pagination.page = page;
+            } else pagination.page = 1;            
+
             const userService = new UserService();
 
-            return res.json(await userService.search(req.query))
+            return res.json(await userService.index(conditions, pagination))
         } catch (error) {
             return res.json(error.message)
+        }
+    }
+
+    async confirmAccount(req, res) {
+        try {
+            const userService = new UserService();
+            
+            return res.json(userService.confirmAccount(req.query.token, req.body.confirmationCode));
+        } catch (error) {
+            return res.json(error.message);
         }
     }
 }

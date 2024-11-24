@@ -7,8 +7,10 @@ const baseJoiValidate = (schema, typeData = 'body') => {
         }
         if (typeData == 'params') {
             data = req.params
-        }
+        }        
+        
         const result = schema.validate(data);
+        
         if (result.error) return res.json(result.error);
         next();
     }
