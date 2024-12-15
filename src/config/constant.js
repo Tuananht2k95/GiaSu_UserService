@@ -11,7 +11,11 @@ export const USER = {
     levelTeacher: {
         tutor: 1,
         teacher: 2,
-    }
+    },
+    idCardStatus: {
+        active: 1,
+        inactive: 2,
+    } 
 };
 
 export const PRODUCT = {
@@ -40,3 +44,4 @@ export const PRODUCT = {
         blocked: 3,
     },
 }
+

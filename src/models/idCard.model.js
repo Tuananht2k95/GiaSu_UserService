@@ -1,14 +1,15 @@
 import mongoose from "mongoose";
 import { ObjectId } from "mongodb";
+import { USER } from "../config/constant.js";
 
-const idenficationSchema = new mongoose.Schema(
+const idCardSchema = new mongoose.Schema(
     {
         userId: {
             type: ObjectId,
             required: true,
         },
         idNumber: {
-            type: string,
+            type: String,
             required: true,
         },
         date: {
@@ -27,7 +28,19 @@ const idenficationSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        idCardStatus: {
+            type: Number,
+            required: true,
+            enum: {
+                values: Object.values(USER.idCardStatus)
+            }, 
+            default: USER.idCardStatus.inactive,
+        },
+        note: {
+            type: String,
+            default: ''
+        }
     }
 );
 
-export const Idenfication = new mongoose.model('Idenfication', idenficationSchema, 'idenfication')
+export const IdCard = new mongoose.model('IdCard', idCardSchema, 'idCard')
