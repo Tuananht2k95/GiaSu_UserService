@@ -4,12 +4,22 @@ import { User } from "../models/user.model.js";
 import EmailService from "./email.service.js";
 import { generateConfirmUrl,generateConfirmationCode, parserJWTToken } from "../helpers/helpers.js";
 import { USER } from "../config/constant.js";
+import redis from "../../database/redis.js";
+import fs from "fs"
+import path from "path";
+import { log } from "console";
+import { IdCard } from "../models/idCard.model.js";
 
 class UserService {
     async store(data) {
         data.password = signHmac(data.password, 'sha256');
-        data.confirmationCode = generateConfirmationCode();
         const newUser = await User.create(data);
+        const confirmationCode = generateConfirmationCode()
+        redis.set(`user:${newUser._id}:confirmationCode`, confirmationCode, {
+            EX: 60 * 60 * 24 * 7
+        });
+        console.log(await redis.get(`user:${newUser._id}:confirmationCode`));
+        
         const emailService = new EmailService();
         
         emailService.sendEmail(
@@ -17,14 +27,14 @@ class UserService {
             'Confirm Account', 
             '/emailConfirm/emailConfirm.ejs', 
             {
-                confirmUrl: generateConfirmUrl(newUser._id),
-                confirmationCode: data.confirmationCode,
+                confirmUrl: generateConfirmUrl(newUser._id.toString()),
+                confirmationCode,
             },
         );
         return newUser;
     };
 
-    async update(userId, data) {
+    async update(userId, data) {        
         if (!isValidObjectId(userId)) {
             return 'User khong ton tai';
         }
@@ -62,7 +72,7 @@ class UserService {
             return 'User khong ton tai';
         };
         return await User.findByIdAndDelete(userId);
-    }
+    };
 
     async index(conditions, pagination) {
         const [data, total] = await Promise.all([
@@ -72,24 +82,47 @@ class UserService {
         return {
             data, total, pagination
         }        
-    }
+    };
 
     async confirmAccount(token, confirmationCode) {
         const res = parserJWTToken(token);
-        const user = await User.findOne({_id: res._id});
+
+        if (!res.success) return res.error
+        const user = await User.findById(res.userId);
         
-        if (user == {}) {
+        if (!user) {
             return "user khong ton tai"
         };
-        if (user.status == USER.status.active) {
+
+        if (user.status === USER.status.active) {
             return "user da xac thuc"
-        }
-        if (confirmationCode == user.confirmationCode) {
-            return user
-            // user.status = USER.status.active;
-            // return "user active thanh cong"
-        } else return "code khong dung"
-    }
+        };
+
+        if (confirmationCode === await redis.get(`user:${user._id}:confirmationCode`)) {
+            user.status = USER.status.active;
+            await User.findByIdAndUpdate(user._id, user)
+            
+            return "user active thanh cong"
+        };
+
+        return "code khong dung";
+    };
+
+    async updateAvatar(userId, filename) {
+        const res = await this.find(userId);
+        const user = res.toObject();
+        fs.unlink(path.resolve('storage/'+ '/' + user.avatar), (error) => {
+            console.log(error);
+        });
+
+        return user;
+    };
+
+    async storeIdCard(idCardData) {
+        const newIdCard = await IdCard.create(idCardData);
+
+        return newIdCard;
+    };
 }
 
 export default UserService;

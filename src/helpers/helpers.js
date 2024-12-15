@@ -1,7 +1,6 @@
 import crypto from "crypto";
 import moment from "moment";
 import { Buffer } from "buffer";
-import { error } from "console";
 
 export const signHmac = (string, algorithm) => {
     let hmac = crypto.createHmac(algorithm, process.env.PRIVATEKEY);
@@ -10,7 +9,7 @@ export const signHmac = (string, algorithm) => {
 };
 
 export const generateConfirmUrl = (userId) => {
-    const token = generateJWTToken(userId, 'sha256', moment().add(1,'days').unix());
+    const token = generateJWTToken(userId, 'sha256', moment().add(7,'days').unix());
 
     return process.env.FE_DOMAIN + '/confirm-account?token=' + token;
 }
@@ -18,7 +17,7 @@ export const generateConfirmUrl = (userId) => {
 export const generateJWTToken = (data, algorithm, exp) => {
     const header = JSON.stringify({
         algorithm: algorithm,
-        type: "JWT"
+        type: "JWT",
     });
     const payload = JSON.stringify({
         _id: data,
@@ -42,7 +41,14 @@ export const generateConfirmationCode = (length = 6) => {
 };
 
 export const parserJWTToken = (JWTToken) => {
-    const res = {succes: false, error: '', _id: ''}
+    const res = {success: false, error: '', userId: ''}
+    
+    if (!JWTToken) {
+        res.error = "token k hop le"
+
+        return res;
+    }
+
     const token = JWTToken.split('.');
     const stringHeader = Buffer.from(token[0], 'base64').toString();    
     const stringPayload = Buffer.from(token[1], 'base64').toString();
@@ -54,15 +60,23 @@ export const parserJWTToken = (JWTToken) => {
 
     if (signature !== token[2]) {
         res.error = 'token khong hop le';
+
         return res
     }
     
     if (payload.exp < moment().unix()) {
         res.error = 'token het han';
+
         return res
     }
+    res.success = true;
+    res.userId = payload._id;
 
-    res.succes = true;
-    res._id = payload._id;
     return res
+}
+
+export const getUrlAvatar = (avatar) => {
+    if (!avatar) return process.env.STORAGE_DOMAIN + '/' + 'test.jpg'
+
+    return process.env.STORAGE_DOMAIN + '/' + avatar
 }

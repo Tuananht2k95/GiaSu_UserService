@@ -5,10 +5,10 @@ import { validateIndexUser, validateStoreUser, validateUpdateUser } from '../../
 const userRouter = express.Router();
 const userController = new UserController();
 
-userRouter.get('/', validateIndexUser, userController.index)
+userRouter.get('/', validateIndexUser,  userController.index)
 userRouter.post('/', validateStoreUser, userController.store);
 userRouter.put('/:userId', validateUpdateUser, userController.update);
-userRouter.get('/:userId', userController.find);
+userRouter.get('/:userId', userController.show);
 userRouter.delete('/:userId', userController.delete);
 userRouter.post('/confirm-account', userController.confirmAccount)
 export default userRouter;

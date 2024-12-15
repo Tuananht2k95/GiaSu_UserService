@@ -1,3 +1,4 @@
+import { User } from "../../models/user.model.js";
 import UserService from "../../services/user.service.js";
 
 class UserController {
@@ -23,7 +24,7 @@ class UserController {
         }
     };
 
-    async find(req, res) {
+    async show(req, res) {
         try {
             const userService = new UserService();
             const user = await userService.find(req.params.userId);
@@ -79,13 +80,13 @@ class UserController {
 
     async confirmAccount(req, res) {
         try {
-            const userService = new UserService();
-            
-            return res.json(userService.confirmAccount(req.query.token, req.body.confirmationCode));
+            const userService = new UserService();            
+            return res.json(await userService.confirmAccount(req.query.token, req.body.confirmationCode));
         } catch (error) {
             return res.json(error.message);
         }
     }
+    
 }
 
 export default UserController;
