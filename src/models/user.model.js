@@ -1,6 +1,6 @@
 import mongoose, { get } from "mongoose";
 import { USER } from "../config/constant.js";
-import { getUrlAvatar } from "../helpers/helpers.js";
+import { getUrl } from "../helpers/helpers.js";
 
 const userSchema = new mongoose.Schema(
     {
@@ -24,7 +24,9 @@ const userSchema = new mongoose.Schema(
         },
         avatar: {
             type: String,
-            get: getUrlAvatar,
+            get: function(avatar) {
+                return getUrl(avatar, 'avatar');
+            },
         },
         gender: {
             type: Number,

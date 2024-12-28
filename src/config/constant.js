@@ -12,11 +12,17 @@ export const USER = {
         tutor: 1,
         teacher: 2,
     },
-    idCardStatus: {
-        active: 1,
-        inactive: 2,
-    } 
+    gender: {
+        male: 1,
+        female: 2,
+    }
 };
+export const IDCARD = {
+    idCardStatus: {
+        confirm: 1,
+        unconfirm: 2,
+    }
+}
 
 export const PRODUCT = {
     subject: {

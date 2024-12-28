@@ -20,6 +20,23 @@ profileRouter.post(
             maxcount: 1
         }
     ]),     
-    profileController.storeIdCard);
+    profileController.storeIdCard
+);
+profileRouter.put(
+    '/idCard',
+    authMiddleware,
+    idCardMulter.fields([
+        {
+            name: 'frontCard',
+            maxcount: 1
+        },
+        {
+            name: 'backCard',
+            maxcount: 1
+        }
+    ]),     
+    profileController.updateIdCard
+)
+
 
 export default profileRouter;
