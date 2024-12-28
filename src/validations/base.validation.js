@@ -1,6 +1,8 @@
+import { responseJsonByStatus, responseError } from "../helpers/helpers.js";
 
 const baseJoiValidate = (schema, typeData = 'body') => {
-    return (req, res, next) => {
+    
+    return (req, res, next) => {        
         let data = req.body;
         if (typeData == 'query') {
             data = req.query
@@ -9,11 +11,21 @@ const baseJoiValidate = (schema, typeData = 'body') => {
             data = req.params
         }        
         
-        const result = schema.validate(data);
+        const result = schema.validate(
+            data, 
+            { abortEarly: false}
+        );
         
-        if (result.error) return res.json(result.error);
+        if (result.error) {
+            return responseJsonByStatus(
+                res,
+                responseError(result.error),
+                422
+            );
+        }
         next();
     }
 }
+
 
 export default baseJoiValidate;

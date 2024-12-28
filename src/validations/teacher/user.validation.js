@@ -1,6 +1,8 @@
 import baseJoiValidate from "../base.validation.js";
 import JoiDate from "@joi/date";
 import BaseJoi from "joi";
+import { USER } from "../../config/constant.js";
+
 const Joi = BaseJoi.extend(JoiDate);
 
 export const validateStoreUser = baseJoiValidate(
@@ -10,7 +12,7 @@ export const validateStoreUser = baseJoiValidate(
         phone: Joi.string().max(11).min(4).required(),
         password: Joi.string().max(255).min(6).required(),
         avatar: Joi.string().max(255),
-        gender: Joi.number().required(),
+        gender: Joi.number().required().valid(USER.gender.male, USER.gender.female),
         dateOfBirth: Joi.date().format('DD/MM/YYYY').messages({
             "date.base": "Format khong dung"
         }),

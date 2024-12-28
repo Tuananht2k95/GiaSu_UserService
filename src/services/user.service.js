@@ -1,14 +1,14 @@
 import { isValidObjectId } from "mongoose";
-import { signHmac } from "../helpers/helpers.js"
+import { signHmac, unlinkFile } from "../helpers/helpers.js"
 import { User } from "../models/user.model.js";
 import EmailService from "./email.service.js";
 import { generateConfirmUrl,generateConfirmationCode, parserJWTToken } from "../helpers/helpers.js";
-import { USER } from "../config/constant.js";
+import { USER, IDCARD } from "../config/constant.js";
 import redis from "../../database/redis.js";
 import fs from "fs"
 import path from "path";
-import { log } from "console";
 import { IdCard } from "../models/idCard.model.js";
+import winston from "winston";
 
 class UserService {
     async store(data) {
@@ -18,8 +18,6 @@ class UserService {
         redis.set(`user:${newUser._id}:confirmationCode`, confirmationCode, {
             EX: 60 * 60 * 24 * 7
         });
-        console.log(await redis.get(`user:${newUser._id}:confirmationCode`));
-        
         const emailService = new EmailService();
         
         emailService.sendEmail(
@@ -111,18 +109,55 @@ class UserService {
     async updateAvatar(userId, filename) {
         const res = await this.find(userId);
         const user = res.toObject();
-        fs.unlink(path.resolve('storage/'+ '/' + user.avatar), (error) => {
-            console.log(error);
-        });
-
+        
+        if (user.avatar == 'xxx.img') {
+            user.avatar = filename;
+        } else {
+            unlinkFile(['storage/user/avatar/' + user.avatar], 'userService');
+            user.avatar = filename;
+        }
+        await User.findByIdAndUpdate(userId, {avatar: filename});
         return user;
     };
 
     async storeIdCard(idCardData) {
+        const idCard = await IdCard.findOne({ userId: idCardData.userId });
+
+        if (idCard != null) return "idCard da ton tai";
         const newIdCard = await IdCard.create(idCardData);
 
         return newIdCard;
     };
+
+    async updateIdCard(idCardData) {
+        const res = await IdCard.findOne({ userId: idCardData.userId });
+        const idCard = res.toObject();    
+        const url = 'storage/user/idCard/';
+
+        if (idCard == null) return "idCard khong ton tai";
+        unlinkFile([
+            url + idCard.frontCard,
+            url + idCard.backCard
+        ], 'userService');
+        const newIdCard = await IdCard.findByIdAndUpdate(idCard._id, idCardData);
+
+        return newIdCard;
+    };
+
+    async confirmIdCard(userId) {
+        const idCard = await IdCard.findOne({userId: userId});        
+        idCard.idCardStatus = IDCARD.idCardStatus.confirm;        
+
+        return idCard
+    };
+
+    async rejectIdCard(userId, note) {
+        const idCard = await IdCard.findOne({userId: userId});        
+        idCard.note= note;
+        await idCard.save();
+
+        return idCard;
+    }
 }
 
 export default UserService;

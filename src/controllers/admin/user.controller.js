@@ -1,5 +1,6 @@
 import { User } from "../../models/user.model.js";
 import UserService from "../../services/user.service.js";
+import { responseJsonByStatus, responseSuccess, responseError } from "../../helpers/helpers.js";
 
 class UserController {
     async store(req, res) {
@@ -7,9 +8,9 @@ class UserController {
             const userService = new UserService();
             const newUser = await userService.store(req.body);
 
-            return res.json(newUser)
+            return responseJsonByStatus(res, responseSuccess(newUser, 200, ''))
         } catch (error) {
-            return res.json(error.message)
+            return responseJsonByStatus(res, responseError(error));
         };  
     };
 

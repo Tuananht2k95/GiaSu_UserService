@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { ObjectId } from "mongodb";
-import { USER } from "../config/constant.js";
+import { IDCARD, USER } from "../config/constant.js";
+import { getUrl } from "../helpers/helpers.js";
 
 const idCardSchema = new mongoose.Schema(
     {
@@ -23,23 +24,31 @@ const idCardSchema = new mongoose.Schema(
         frontCard: {
             type: String,
             required: true,
+            get: function(avatar) {
+                return getUrl(avatar, 'avatar');
+            },
         },
         backCard: {
             type: String,
             required: true,
+            get: function(avatar) {
+                return getUrl(avatar, 'avatar');
+            },
         },
         idCardStatus: {
             type: Number,
-            required: true,
             enum: {
-                values: Object.values(USER.idCardStatus)
+                values: Object.values(IDCARD.idCardStatus)
             }, 
-            default: USER.idCardStatus.inactive,
+            default: IDCARD.idCardStatus.unconfirm,
         },
         note: {
             type: String,
-            default: ''
+            default: '',
         }
+    },
+    {
+        toJSON: {getters: true},
     }
 );
 
