@@ -1,14 +1,16 @@
 import UserService from "../../services/user.service.js";
+import { responseJsonByStatus, responseError, responseSuccess } from "../../helpers/helpers.js";
 
 class UserController {
+    static userService = new UserService();
+
     async store(req, res) {
         try {
-            const userService = new UserService();
-            const newUser = await userService.store(req.body);
+            const newUser = await UserController.userService.store(req.body);
 
-            return res.json(newUser)
+            return responseJsonByStatus( res, responseSuccess(newUser, 200, 'Regiter success'));
         } catch (error) {
-            return res.json(error.message)
+            return responseJsonByStatus( res, responseError(error, 500, 'register failed') );
         };
     };
 

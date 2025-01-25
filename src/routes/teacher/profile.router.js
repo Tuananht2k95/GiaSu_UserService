@@ -6,7 +6,8 @@ import { authMiddleware } from "../../middleware/auth.middleware.js";
 const profileRouter = express.Router();
 const profileController = new ProfileController();
 
-profileRouter.get('/test', (req,res)=>{res.json("test profile")});
+profileRouter.use( authMiddleware );
+profileRouter.get('/', profileController.show);
 profileRouter.post(
     '/idCard', 
     authMiddleware,

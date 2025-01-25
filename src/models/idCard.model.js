@@ -24,15 +24,15 @@ const idCardSchema = new mongoose.Schema(
         frontCard: {
             type: String,
             required: true,
-            get: function(avatar) {
-                return getUrl(avatar, 'avatar');
+            get: function(img) {
+                return getUrl(img, 'user/idCard');
             },
         },
         backCard: {
             type: String,
             required: true,
-            get: function(avatar) {
-                return getUrl(avatar, 'avatar');
+            get: function(img) {
+                return getUrl(img, 'user/idCard');
             },
         },
         idCardStatus: {

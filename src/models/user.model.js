@@ -1,4 +1,4 @@
-import mongoose, { get } from "mongoose";
+import mongoose, { get, set } from "mongoose";
 import { USER } from "../config/constant.js";
 import { getUrl } from "../helpers/helpers.js";
 
@@ -24,8 +24,9 @@ const userSchema = new mongoose.Schema(
         },
         avatar: {
             type: String,
-            get: function(avatar) {
-                return getUrl(avatar, 'avatar');
+            default: 'test.jpg',
+            get: function(img) {
+                return getUrl(img, 'user/avatar')
             },
         },
         gender: {
@@ -65,9 +66,29 @@ const userSchema = new mongoose.Schema(
             },
             default: USER.status.inactive,
         },
+        createdAt: {
+            type: Date,
+            required: false,
+            timestamps: true,
+        },
+        updatedAt: {
+            type: Date,
+            required: false,
+            timestamps: true,
+        },
+        createBy: {
+            type: String,
+            required: false,
+        },
+        updateBy: {
+            type: String, 
+            required: false,
+        }
+        
     },
     {
         toJSON: {getters: true},
+        timestamps: true,
     }
 );
 

@@ -1,6 +1,12 @@
 import UserService from "../../services/user.service.js"
 
 class ProfileController {
+    static userService = new UserService();
+
+    async show(req, res) {
+        res.json('test')
+    }
+
     async storeIdCard(req, res) {   
         const idCardData = {
             ...{ userId: req.authUser._id },

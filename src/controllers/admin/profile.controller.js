@@ -4,12 +4,14 @@ import { ObjectId } from "mongodb";
 import winston from "winston";
 
 class ProfileController {
+    static userService = new UserService();
+
     async updateAvatar(req, res) {
         try {
             winston.loggers.get('user').info('update avatar');
-            const userService = new UserService();
+
             if (!req.file) return responseJsonByStatus(res, responseError('file k ton tai'), 400);
-            const newUser = await userService.updateAvatar(req.authUser._id, req.file.filename);
+            const newUser = await ProfileController.userService.updateAvatar(req.authUser._id, req.file.filename);
     
             return responseJsonByStatus(res, responseSuccess(newUser), 200);
         } catch (error) {
@@ -20,48 +22,26 @@ class ProfileController {
     async show(req, res) {
         try {
             const userId = req.authUser._id;
-            const userService = new UserService();
+            winston.loggers.get('user').info(`user ${userId} get detail`);
 
-            return responseJsonByStatus(res, responseSuccess(await userService.find(userId)), 200);
+            return responseJsonByStatus(res, responseSuccess(await ProfileController.userService.find(userId)), 200);
         } catch (error) {
             responseJsonByStatus(res, responseError(error.message), 500);
         }
     };
 
-    async update(req, res) {
+    async updatePassword(req, res) {
         try {            
-            const userId = req.authUser._id;
-            const userService = new UserService();
+            const userId = req.authUser._id;            
             const newPassword = signHmac(req.body.password, 'sha256');
+            winston.loggers.get('user').info(`user ${req.authUser._id} update password`);
 
-            return responseJsonByStatus(res, responseSuccess(await userService.update(userId, {password: newPassword})), 200);
+            return responseJsonByStatus(res, responseSuccess(await ProfileController.userService.update(userId, {password: newPassword})), 200);
         } catch (error) {
             responseJsonByStatus(res, responseError(error.message), 500);
         }
     };
 
-    async confirmIdCard(req, res) {
-        try {
-            const userId = new ObjectId(req.body.userId);    
-            const userService = new UserService();
-            
-            return responseJsonByStatus(res, responseSuccess(await userService.confirmIdCard(userId)), 200);
-        } catch (error) {
-            responseJsonByStatus(res, responseError(error.message), 500);
-        }
-    };
-
-    async rejectIdCard(req, res) {
-        try {
-            const userId = new ObjectId(req.body.userId);    
-            const userService = new UserService();
-            const note = req.body.note;
-
-            return responseJsonByStatus(res, responseSuccess(await userService.rejectIdCard(userId, note)), 200);
-        } catch (error) {
-            responseJsonByStatus(res, responseError(error.message), 500);
-        }
-    };
 }
 
 export default ProfileController;
