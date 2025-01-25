@@ -1,19 +1,18 @@
 import { isValidObjectId } from "mongoose";
-import { signHmac, unlinkFile } from "../helpers/helpers.js"
-import { User } from "../models/user.model.js";
+import { signHmac, unlinkFiles } from "../helpers/helpers.js"
 import EmailService from "./email.service.js";
 import { generateConfirmUrl,generateConfirmationCode, parserJWTToken } from "../helpers/helpers.js";
-import { USER, IDCARD } from "../config/constant.js";
 import redis from "../../database/redis.js";
-import fs from "fs"
-import path from "path";
-import { IdCard } from "../models/idCard.model.js";
-import winston from "winston";
+import UserRepository from "../repository/user.repository.js";
+import IdCardRepository from "../repository/idCard.repository.js"
 
 class UserService {
-    async store(data) {
-        data.password = signHmac(data.password, 'sha256');
-        const newUser = await User.create(data);
+    static userRepository = new UserRepository();
+    static idCardRepository = new IdCardRepository();
+
+    async store(user) {
+        user.password = signHmac(user.password, 'sha256');
+        const newUser = await UserService.userRepository.store(user);
         const confirmationCode = generateConfirmationCode()
         redis.set(`user:${newUser._id}:confirmationCode`, confirmationCode, {
             EX: 60 * 60 * 24 * 7
@@ -21,7 +20,7 @@ class UserService {
         const emailService = new EmailService();
         
         emailService.sendEmail(
-            [data.email], 
+            [user.email], 
             'Confirm Account', 
             '/emailConfirm/emailConfirm.ejs', 
             {
@@ -32,132 +31,87 @@ class UserService {
         return newUser;
     };
 
-    async update(userId, data) {        
-        if (!isValidObjectId(userId)) {
-            return 'User khong ton tai';
-        }
-
-        const user = await User.findById(userId);
-
-        if (user == null) {
-            return 'User khong ton tai';
-        };
-        const userUpdated = await User.findByIdAndUpdate(userId, data);
-        return userUpdated;
-    };
-
     async find(userId) {
         if (!isValidObjectId(userId)) {
-            return 'User khong ton tai';
-        }
+            throw new Error('Khong co userId truyen vao');
+        };
 
-        const user = await User.findById(userId);
+        const user = await UserService.userRepository.findById(userId);
 
         if (user == null) {
-            return 'User khong ton tai';
+            throw new Error('User khong ton tai trong DB');
         };
         return user;
+    };
+
+    async update(userId, data, authUser = {}) {        
+        await this.find(userId);
+
+        return await UserService.userRepository.findByIdAndUpdate(userId, data, authUser);;
     };
 
     async delete(userId) {
-        if (!isValidObjectId(userId)) {
-            return 'User khong ton tai';
-        }
-
-        const user = await User.findById(userId);
-
-        if (user == null) {
-            return 'User khong ton tai';
-        };
-        return await User.findByIdAndDelete(userId);
+        await this.find(userId);
+        
+        return await UserService.userRepository.findByIdAndDelete(userId);
     };
 
     async index(conditions, pagination) {
-        const [data, total] = await Promise.all([
-            User.find(conditions).skip((pagination.page-1)*pagination.limit).limit(pagination.limit),
-            User.find(conditions)
-        ]);
         return {
-            data, total, pagination
-        }        
-    };
-
-    async confirmAccount(token, confirmationCode) {
-        const res = parserJWTToken(token);
-
-        if (!res.success) return res.error
-        const user = await User.findById(res.userId);
-        
-        if (!user) {
-            return "user khong ton tai"
+            data: await UserService.userRepository.index(conditions, pagination), 
+            pagination
         };
-
-        if (user.status === USER.status.active) {
-            return "user da xac thuc"
-        };
-
-        if (confirmationCode === await redis.get(`user:${user._id}:confirmationCode`)) {
-            user.status = USER.status.active;
-            await User.findByIdAndUpdate(user._id, user)
-            
-            return "user active thanh cong"
-        };
-
-        return "code khong dung";
     };
 
     async updateAvatar(userId, filename) {
-        const res = await this.find(userId);
-        const user = res.toObject();
+        const user = await this.find(userId);
+        const currentAvatar = user.get('avatar', null, { getters: false });
+        unlinkFiles([
+            'storage/user/avatar/' + currentAvatar
+        ])
         
-        if (user.avatar == 'xxx.img') {
-            user.avatar = filename;
-        } else {
-            unlinkFile(['storage/user/avatar/' + user.avatar], 'userService');
-            user.avatar = filename;
-        }
-        await User.findByIdAndUpdate(userId, {avatar: filename});
-        return user;
+        return await UserService.userRepository.findByIdAndUpdate(userId, { avatar: filename }, user); 
     };
 
-    async storeIdCard(idCardData) {
-        const idCard = await IdCard.findOne({ userId: idCardData.userId });
+    // async storeIdCard(idCardData) {
+    //     const idCard = await UserService.userRepository.findOne({ userId: idCardData.userId });
+    //     await IdCard.findOne({ userId: idCardData.userId });
 
-        if (idCard != null) return "idCard da ton tai";
-        const newIdCard = await IdCard.create(idCardData);
+    //     if (idCard != null) return "idCard da ton tai";
+    //     const newIdCard = await IdCard.create(idCardData);
 
-        return newIdCard;
-    };
+    //     return newIdCard;
+    // };
 
-    async updateIdCard(idCardData) {
-        const res = await IdCard.findOne({ userId: idCardData.userId });
-        const idCard = res.toObject();    
-        const url = 'storage/user/idCard/';
+    // async updateIdCard(idCardData) {
+    //     const res = await IdCard.findOne({ userId: idCardData.userId });
+    //     const idCard = res.toObject();    
+    //     const url = 'storage/user/idCard/';
 
-        if (idCard == null) return "idCard khong ton tai";
-        unlinkFile([
-            url + idCard.frontCard,
-            url + idCard.backCard
-        ], 'userService');
-        const newIdCard = await IdCard.findByIdAndUpdate(idCard._id, idCardData);
+    //     if (idCard == null) return "idCard khong ton tai";
+    //     unlinkFiles([
+    //         url + idCard.frontCard,
+    //         url + idCard.backCard
+    //     ], 'userService');
+    //     const newIdCard = await IdCard.findByIdAndUpdate(idCard._id, idCardData);
 
-        return newIdCard;
-    };
+    //     return newIdCard;
+    // };
 
-    async confirmIdCard(userId) {
-        const idCard = await IdCard.findOne({userId: userId});        
-        idCard.idCardStatus = IDCARD.idCardStatus.confirm;        
+    // async confirmIdCard(userId) {
+    //     const idCard = await IdCard.findOne({userId: userId});        
+    //     idCard.idCardStatus = IDCARD.idCardStatus.confirm;        
 
-        return idCard
-    };
+    //     return idCard
+    // };
 
-    async rejectIdCard(userId, note) {
-        const idCard = await IdCard.findOne({userId: userId});        
-        idCard.note= note;
-        await idCard.save();
+    // async rejectIdCard(userId, note) {
+    //     const idCard = await IdCard.findOne({userId: userId});        
+    //     idCard.note= note;
+    //     await idCard.save();
 
-        return idCard;
-    }
+    //     return idCard;
+    // }
 }
 
 export default UserService;

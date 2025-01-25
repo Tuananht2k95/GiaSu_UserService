@@ -35,7 +35,7 @@ export const generateJWTToken = (data, algorithm, exp) => {
 };
 
 export const generateConfirmationCode = (length = 6) => {
-    const confirmationCode = Math.floor(Math.random() * 10 ** length);
+    let confirmationCode = Math.floor(Math.random() * 10 ** length);
     if (confirmationCode < 100000) {
         confirmationCode += `${Math.floor(Math.random() * 10)}`;
     }
@@ -74,14 +74,13 @@ export const parserJWTToken = (JWTToken) => {
     }
     res.success = true;
     res.userId = payload._id;
-
+    
     return res
 }
 
 export const getUrl = (img, filelocation) => {
-    if (!img) return process.env.STORAGE_DOMAIN + `/${filelocation}` + 'test.jpg'
-
-    return process.env.STORAGE_DOMAIN + `/${filelocation}` + img
+    if (!img) return process.env.STORAGE_DOMAIN + `/${filelocation}` + '/test.jpg'
+    return process.env.STORAGE_DOMAIN + `/${filelocation}/` + img
 };
 
 export const responseJsonByStatus = ( res, data, statusCode = 200 ) => {
@@ -162,12 +161,13 @@ export const responseError = ( errors, statusCode = 500, message = '' ) => {
     return response;
 }
 
-export const unlinkFile = (urls, serviceName='') => {
+export const unlinkFiles = (urls, serviceName='') => {
     for (const url of urls) {
         fs.unlink(
             path.resolve(url), 
             (error) => {
                 if (error) winston.loggers.get('user').error(serviceName, error);
-            });
+            }
+        );
     }
 }
