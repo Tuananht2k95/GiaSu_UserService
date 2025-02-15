@@ -3,6 +3,7 @@ import { USER } from "../config/constant.js";
 import { generateJWTToken, parserJWTToken } from "../helpers/helpers.js";
 import moment from "moment";
 import UserRepository from "../repository/user.repository.js";
+import redis from "../../database/redis.js";
 
 class AuthService {
     static userRepository = new UserRepository();
@@ -33,7 +34,7 @@ class AuthService {
             throw new Error('user da xac thuc')
         };
 
-        if (confirmationCode === await redis.get(`user:${user._id}:confirmationCode`)) {
+        if (confirmationCode === await redis().get(`user:${user._id}:confirmationCode`)) {
             const data = {
                 status: USER.status.active
             };
