@@ -9,8 +9,6 @@ const connectString = `redis://${username}:${password}@${host}:${port}`;
 const configCilent = {
     url: connectString,
 }
-console.log(connectString);
-
 
 const redis = () => {
     const client = createClient(configCilent);
