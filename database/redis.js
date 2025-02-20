@@ -1,23 +1,28 @@
 import { createClient } from "redis";
 
-// const host = process.env.REDIS_HOST;
-// const username = process.env.REDIS_USERNAME;
-// const password = process.env.REDIS_PASSWORD;
+const host = process.env.REDIS_HOST;
+const username = process.env.REDIS_USERNAME;
+const password = process.env.REDIS_PASSWORD;
 const port = process.env.REDIS_PORT;
 
-// const connectString = `redis://${password}@${host}:${port}`;
-const connectString = 'redis://127.0.0.1:6379'
+const connectString = `redis://${username}:${password}@${host}:${port}`;
 const configCilent = {
     url: connectString,
 }
 
-const redis = createClient(configCilent);
-redis.on(
-    'error',
-    (err) => console.log(err)
-)
-redis.connect().then(
-    () => console.log(`redis connected, port = ${port}`)
-)
+const redis = () => {
+    const client = createClient(configCilent);
+    client.on(
+        'error',
+        (err) => console.log(err)
+    )
+    
+    client.connect().then(
+        () => console.log(`redis connected, port = ${port}`)
+    )
+    return client
+}
+
+
 
 export default redis

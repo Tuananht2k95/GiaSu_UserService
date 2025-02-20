@@ -10,7 +10,6 @@ const baseJoiValidate = (schema, typeData = 'body') => {
 
         if (typeData == 'params') {
             data = req.params;
-            console.log('1', data);
             
         }        
         const result = schema.validate(

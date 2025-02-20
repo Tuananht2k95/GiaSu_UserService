@@ -14,7 +14,7 @@ class UserService {
         user.password = signHmac(user.password, 'sha256');
         const newUser = await UserService.userRepository.store(user);
         const confirmationCode = generateConfirmationCode()
-        redis.set(`user:${newUser._id}:confirmationCode`, confirmationCode, {
+        redis().set(`user:${newUser._id}:confirmationCode`, confirmationCode, {
             EX: 60 * 60 * 24 * 7
         });
         const emailService = new EmailService();
