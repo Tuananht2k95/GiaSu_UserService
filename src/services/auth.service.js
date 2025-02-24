@@ -4,24 +4,66 @@ import { generateJWTToken, parserJWTToken } from "../helpers/helpers.js";
 import moment from "moment";
 import UserRepository from "../repository/user.repository.js";
 import redis from "../../database/redis.js";
+import HttpError from "../eceptions/httpError.eception.js";
 
 class AuthService {
     static userRepository = new UserRepository();
 
     async login(email, password) {
-        const user = await AuthService.userRepository.findOne({email: email})     
+        const user = await AuthService.userRepository.findOne({email: email});
 
-        if ( !user ) throw 'Khong ton tai user'
+
+        if ( !user ) throw new HttpError(
+            {
+                errors: [
+                    {
+                        key: 'email',
+                        value: email,
+                        message: 'Email chưa đăng ký',
+                    }
+                ] 
+            }, 422
+        )
 
         if ( user.status === USER.status.inactive ) 
-            throw 'user chua xac thuc'
+            throw new HttpError(
+                {
+                    errors: [
+                        {
+                            key: 'email',
+                            value: email,
+                            message: 'Email này chưa được xác thực, kiểm tra lại email của bạn',
+                        }
+                    ]
+                }
+        )
 
         if (user.status === USER.status.blocked) 
-            throw 'user bi block'
+            throw new HttpError(
+                {
+                    errors: [
+                        {
+                            key: 'email',
+                            value: email,
+                            message: 'Email này đã bị khoá bởi hệ thống',
+                        }
+                    ]
+                }
+        )
 
         if (user.password === signHmac(password, 'sha256')) 
             return generateJWTToken(user._id, 'sha256', moment().add(7,'days').unix());
-        else throw 'password khong dung'
+        else throw new HttpError(
+            {
+                errors: [
+                    {
+                        key: 'password',
+                        value: password,
+                        message: 'Password không đúng',
+                    }
+                ]
+            }
+        )
     };
 
     async confirmAccount(token, confirmationCode) {
