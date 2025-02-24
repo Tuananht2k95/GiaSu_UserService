@@ -10,7 +10,7 @@ class UserController {
 
             return responseJsonByStatus( res, responseSuccess(newUser, 200, 'Regiter success'));
         } catch (error) {
-            return responseJsonByStatus( res, responseError(error, 500, 'register failed') );
+            return responseJsonByStatus( res, responseError(error, 500, 'Register failed') );
         };
     };
 

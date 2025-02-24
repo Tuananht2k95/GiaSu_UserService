@@ -1,11 +1,19 @@
 import UserService from "../../services/user.service.js"
-
+import { responseJsonByStatus, responseError, responseSuccess } from "../../helpers/helpers.js";
+import winston from "winston";
 class ProfileController {
     static userService = new UserService();
 
     async show(req, res) {
-        res.json('test')
-    }
+            try {
+                const userId = req.authUser._id;
+                winston.loggers.get('user').info(`user ${userId} get detail`);
+    
+                return responseJsonByStatus(res, responseSuccess(await ProfileController.userService.find(userId)), 200);
+            } catch (error) {
+                responseJsonByStatus(res, responseError(error.message), 500);
+            }
+        };
 
     async storeIdCard(req, res) {   
         const idCardData = {

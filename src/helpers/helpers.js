@@ -4,6 +4,7 @@ import { Buffer } from "buffer";
 import winston from "winston";
 import fs from "fs";
 import path from "path";    
+import HttpError from "../eceptions/httpError.eception.js";
 
 export const signHmac = (string, algorithm) => {
     let hmac = crypto.createHmac(algorithm, process.env.PRIVATEKEY);
@@ -96,7 +97,9 @@ export const responseSuccess = ( data, statusCode = 200, message ='' ) => {
     }
 }
 
-export const responseError = ( errors, statusCode = 500, message = '' ) => {    
+export const responseError = ( errors, statusCode = 500, message = '' ) => { 
+    console.log(errors.name);
+       
     const response = {
         now: moment(),
         statusCode,
@@ -132,7 +135,7 @@ export const responseError = ( errors, statusCode = 500, message = '' ) => {
     }
     
     if (errors instanceof Error && errors.name === 'ValidationError') {
-        for (const error of errors.details) {
+        for (const error of errors) {
             response.errors.push({
                 key: error.context.key, 
                 value: error.context.value,
@@ -152,9 +155,15 @@ export const responseError = ( errors, statusCode = 500, message = '' ) => {
         return response;
     }
 
+    if (errors instanceof HttpError) {
+        response.errors = JSON.parse(errors.message).errors;   
+        response.statusCode = errors.statusCode
+        return response;
+    }
+
     if (errors instanceof Error) {
         response.message = errors.message;
-        
+        response
         return response;
     }
 
