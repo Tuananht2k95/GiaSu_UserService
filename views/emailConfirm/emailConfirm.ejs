@@ -3,13 +3,23 @@
 
     </head>
     <body>
-        <h3>Xác thực EMAIL</h3>
-        <p>
-    
-        </p>
-        <p>
-            <a href="<%= confirmUrl%>">Nhấp vào đây</a>
-        </p>
-        <p><%= confirmationCode%></p>
+        <table>
+            <tr>
+                <td>
+                  <p>Cảm ơn bạn đã đăng ký</p>
+                  <p>Nhấn vào link ở dưới sau đó nhập code để xác thực tài khoản</p>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td>
+                            <a href="<%= confirmUrl %>">Xác thực tài khoản</a>
+                            <p>Mã xác thực: <%= confirmationCode %></p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+        </table>
     </body>
 </html>

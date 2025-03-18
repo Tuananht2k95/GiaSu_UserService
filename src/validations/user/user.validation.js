@@ -21,18 +21,18 @@ const validateIndexUserSchema = Joi.object({
 const validateStoreUserSchema = Joi.object({
     name: Joi.string().max(255).required(),
     email: Joi.string().max(255).required().email(),
-    phone: Joi.string().max(11).min(4).required(),
     password: Joi.string().max(255).min(6).required(),
-    gender: Joi.number().required().valid(USER.gender.male, USER.gender.female),
-    dateOfBirth: Joi.date().format('DD/MM/YYYY').messages({
-        "date.base": "Format khong dung"
-    }),
 });
 const validateUserIdSchema = Joi.object({
     userId: Joi.string().max(255).required(),
-})
+});
+const validateLoginUserSchema = Joi.object({
+    email: Joi.string().max(255).required().email(),
+    password: Joi.string().max(255).min(6).required(),
+});
 
 export const validateStoreUser = baseJoiValidate( validateStoreUserSchema );
 export const validateIndexUser = baseJoiValidate( validateIndexUserSchema, 'query' );
 export const validateUpdateUser = baseJoiValidate( validateUpdateUserSchema );
 export const validateUserId = baseJoiValidate( validateUserIdSchema, 'params' );
+export const validateLoginUser = baseJoiValidate( validateLoginUserSchema );

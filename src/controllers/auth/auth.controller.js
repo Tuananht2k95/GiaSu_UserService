@@ -27,7 +27,7 @@ class AuthController {
             const newUser = req.body;
             return responseJsonByStatus(res, responseSuccess(await AuthController.userService.store(newUser)), 200)
         } catch (error) {   
-            return responseJsonByStatus(req, responseError(error), 500)
+            return responseJsonByStatus(res, responseError(error), 409)
         }
     }
 
