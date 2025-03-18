@@ -12,7 +12,6 @@ class AuthService {
     async login(email, password) {
         const user = await AuthService.userRepository.findOne({email: email});
 
-
         if ( !user ) throw new HttpError(
             {
                 errors: [
@@ -22,7 +21,7 @@ class AuthService {
                         message: 'Email chưa đăng ký',
                     }
                 ] 
-            }, 422
+            }
         )
 
         if ( user.status === USER.status.inactive ) 
@@ -73,7 +72,17 @@ class AuthService {
         const user = await AuthService.userRepository.findById(parsedToken.userId);
 
         if (user.status === USER.status.active) {
-            throw new Error('user da xac thuc')
+            throw new HttpError(
+                {
+                    errors: [
+                        {
+                            key: 'email',
+                            value: user.email,
+                            message: 'Email này đã được xác thực',
+                        }
+                    ]
+                }
+            )
         };
 
         if (confirmationCode === await redis().get(`user:${user._id}:confirmationCode`)) {
@@ -84,7 +93,17 @@ class AuthService {
             return  await AuthService.userRepository.findByIdAndUpdate(user._id, data, user); 
         };
 
-        throw new Error("code khong dung");
+        throw new HttpError(
+            {
+                errors: [
+                    {
+                        key: 'confirmationCode',
+                        value: confirmationCode,
+                        message: 'Mã xác thực không đúng',
+                    }
+                ]
+            }
+        )
     };
 };
 

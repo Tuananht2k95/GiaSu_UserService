@@ -1,11 +1,9 @@
-import express from "express";
-import userRouter from "./user.router.js";
-import profileRouter from "./profile.router.js";
+// import express from "express";
+// import userRouter from "./user.router.js";
 
-const teacherRouter = express.Router();
+// const teacherRouter = express.Router();
 
-teacherRouter.use('/user', userRouter);
-teacherRouter.use('/profile', profileRouter);
+// teacherRouter.use('/user', userRouter);
 
-export default teacherRouter;
+// export default teacherRouter;
 

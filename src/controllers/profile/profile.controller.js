@@ -1,6 +1,5 @@
 import { responseError, responseJsonByStatus, responseSuccess, signHmac } from "../../helpers/helpers.js";
 import UserService from "../../services/user.service.js"
-import { ObjectId } from "mongodb";
 import winston from "winston";
 
 class ProfileController {

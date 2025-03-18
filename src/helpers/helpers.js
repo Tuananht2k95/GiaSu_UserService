@@ -61,7 +61,7 @@ export const parserJWTToken = (JWTToken) => {
     const base64Header = Buffer.from(stringHeader).toString('base64').replace('==', '').replace('=', '');
     const base64Payload = Buffer.from(stringPayload).toString('base64').replace('==', '').replace('=', '');
     const signature = signHmac(base64Header + '.' + base64Payload, header.algorithm);
-
+    
     if (signature !== token[2]) {
         res.error = 'token khong hop le';
 
@@ -84,7 +84,8 @@ export const getUrl = (img, filelocation) => {
     return process.env.STORAGE_DOMAIN + `/${filelocation}/` + img
 };
 
-export const responseJsonByStatus = ( res, data, statusCode = 200 ) => {
+export const responseJsonByStatus =  ( res, data, statusCode = 200 ) => {
+
     return res.status(statusCode).json(data);
 };
 
@@ -98,28 +99,26 @@ export const responseSuccess = ( data, statusCode = 200, message ='' ) => {
 }
 
 export const responseError = ( errors, statusCode = 500, message = '' ) => { 
-    console.log(errors.name);
-       
+
     const response = {
         now: moment(),
         statusCode,
         errors: [],
         message,
     }    
+    // winston.loggers.get('system').error('errors', errors);    
 
     if (typeof errors === 'string') {
-        winston.loggers.get('system').error('errors', new Error(errors));
         response.message = errors;
         
         return response;
     }
-    winston.loggers.get('system').error('errors', errors);
 
-    if (errors instanceof Error && errors.name === 'MongoServerError') {        
-        const [key, value] = Object.entries(errors.keyValue)[0];
+    if (errors instanceof Error && errors.name === 'MongoServerError') {                   
+        const [[key, value]] = Object.entries(errors.keyValue);        
 
         switch (errors.code) {
-            case 11000:
+            case 11000:                
                 response.errors.push({
                     key,
                     value,
@@ -135,14 +134,14 @@ export const responseError = ( errors, statusCode = 500, message = '' ) => {
     }
     
     if (errors instanceof Error && errors.name === 'ValidationError') {
-        for (const error of errors) {
+        for (const error of errors.details) {
             response.errors.push({
                 key: error.context.key, 
                 value: error.context.value,
                 message: error.message,
             });
         }       
-        
+
         return response;
     }
 

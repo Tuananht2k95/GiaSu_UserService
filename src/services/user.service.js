@@ -11,9 +11,9 @@ class UserService {
     static idCardRepository = new IdCardRepository();
 
     async store(user) {
-        user.password = signHmac(user.password, 'sha256');
         const newUser = await UserService.userRepository.store(user);
-        const confirmationCode = generateConfirmationCode()
+        const confirmationCode = generateConfirmationCode();
+        user.password = signHmac(user.password, 'sha256');
         redis().set(`user:${newUser._id}:confirmationCode`, confirmationCode, {
             EX: 60 * 60 * 24 * 7
         });
@@ -28,6 +28,7 @@ class UserService {
                 confirmationCode,
             },
         );
+
         return newUser;
     };
 
@@ -75,7 +76,7 @@ class UserService {
 
     // async storeIdCard(idCardData) {
     //     const idCard = await UserService.userRepository.findOne({ userId: idCardData.userId });
-    //     await IdCard.findOne({ userId: idCardData.userId });
+    //     await idCard.findOne({ userId: idCardData.userId });
 
     //     if (idCard != null) return "idCard da ton tai";
     //     const newIdCard = await IdCard.create(idCardData);

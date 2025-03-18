@@ -15,15 +15,17 @@ const baseJoiValidate = (schema, typeData = 'body') => {
         const result = schema.validate(
             data, 
             { abortEarly: false }
-        );
+        );        
         
         if (result.error) {
+                        
             return responseJsonByStatus(
                 res,
                 responseError(result.error),
                 422
             );
         }
+
         next();
     }
 }

@@ -1,11 +1,13 @@
 import { USER } from "../config/constant.js";
-import { parserJWTToken } from "../helpers/helpers.js";
+import { parserJWTToken, responseError } from "../helpers/helpers.js";
 import { User } from "../models/user.model.js";
+import { responseJsonByStatus } from "../helpers/helpers.js";
 
 export const adminOnlyMiddeware = async (req, res, next) => {
-    const data = parserJWTToken(req.query.token);
-    const user = await User.findById(data._id);        
+    const tokenParsed = parserJWTToken(req.query.token);
+    const user = await User.findById(tokenParsed._id);   
+
     if (user.role == USER.role.admin) {
         next();
-    } else res.json('Không có quyền truy cập')
+    } else responseJsonByStatus(res, responseError('You are not admin'), 403);
 };
