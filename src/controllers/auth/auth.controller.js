@@ -1,5 +1,5 @@
 import HttpError from "../../eceptions/httpError.eception.js";
-import { responseError, responseJsonByStatus, responseSuccess } from "../../helpers/helpers.js";
+import { responseError, responseJsonByStatus, responseSuccess, signHmac } from "../../helpers/helpers.js";
 import AuthService from "../../services/auth.service.js";
 import UserService from "../../services/user.service.js";
 import winston from "winston";
@@ -40,6 +40,19 @@ class AuthController {
             return responseJsonByStatus( res, responseError(error) );
         }
     }
+
+    async resetPassword(req, res) {
+        try {
+            winston.loggers.get('user').info('user reset password')
+
+            return responseJsonByStatus( res, responseSuccess(
+                await AuthController.authService.resetPassword( req.body.email )
+            ))
+        } catch(error) {             
+            return responseJsonByStatus( res, responseError(error), 404 );
+        }
+    }
+    
 };
 
 export default AuthController;

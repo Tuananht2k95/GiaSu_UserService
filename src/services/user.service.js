@@ -74,6 +74,20 @@ class UserService {
         return await UserService.userRepository.findByIdAndUpdate(userId, { avatar: filename }, user); 
     };
 
+    async updatePassword( userId, oldPassword, newPassword ) {
+        const user = await this.find(userId);
+
+        if ( oldPassword !== user.password ) {
+            throw new Error('Mật khẩu hiện tại không chính xác');
+        } 
+        
+        if ( oldPassword == newPassword ) {
+            throw new Error('Mật khẩu mới giống mật khẩu cũ')
+        }
+
+        return await this.update( userId, {password: newPassword} );
+    }
+
     // async storeIdCard(idCardData) {
     //     const idCard = await UserService.userRepository.findOne({ userId: idCardData.userId });
     //     await idCard.findOne({ userId: idCardData.userId });

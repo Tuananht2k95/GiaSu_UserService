@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema(
             required: true,
         },
         currentWorkplace: {
-            type: String,
+            type: String, 
         },
         previousWorkplace: {
             type: String,

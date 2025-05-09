@@ -11,8 +11,8 @@ profileRouter.put(
     '/avatar', 
     avatarMulter.single('avatar'), 
     profileController.updateAvatar);
-profileRouter.put('/', profileController.updatePassword);
 profileRouter.get('/', profileController.show);
+profileRouter.post('/updatePassword', profileController.updatePassword);
 // profileRouter.post(
 //     '/idCard', 
 //     authMiddleware,
