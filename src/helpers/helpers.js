@@ -6,7 +6,7 @@ import fs from "fs";
 import path from "path";    
 import HttpError from "../eceptions/httpError.eception.js";
 
-export const signHmac = (string, algorithm) => {
+export const signHmac = (string, algorithm = 'sha256') => {
     let hmac = crypto.createHmac(algorithm, process.env.PRIVATEKEY);
     let signed = hmac.update(string).digest("hex");
     return signed
@@ -43,6 +43,21 @@ export const generateConfirmationCode = (length = 6) => {
 
     return confirmationCode;
 };
+
+export const generatePassword = (length = 6) => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    const lowercase = 'abcdefghijklmnopqrstuvwxyz'
+    let password = '';
+    password += uppercase.charAt(Math.floor(Math.random() * uppercase.length));
+    password += lowercase.charAt(Math.floor(Math.random() * lowercase.length));
+    password += Math.floor(Math.random() * 10);
+
+    for (let i = 3; i < length; i++) {
+        password += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return password;
+}
 
 export const parserJWTToken = (JWTToken) => {
     const res = {success: false, error: '', userId: ''}
@@ -134,6 +149,7 @@ export const responseError = ( errors, statusCode = 500, message = '' ) => {
     }
     
     if (errors instanceof Error && errors.name === 'ValidationError') {
+        
         for (const error of errors.details) {
             response.errors.push({
                 key: error.context.key, 
@@ -155,14 +171,15 @@ export const responseError = ( errors, statusCode = 500, message = '' ) => {
     }
 
     if (errors instanceof HttpError) {
-        response.errors = JSON.parse(errors.message).errors;   
+        response.errors = JSON.parse(errors.message).errors;     
         response.statusCode = errors.statusCode
+        
         return response;
     }
 
     if (errors instanceof Error) {
         response.message = errors.message;
-        response
+        
         return response;
     }
 

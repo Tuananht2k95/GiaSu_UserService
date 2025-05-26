@@ -25,27 +25,27 @@
 //         };  
 //     };
 
-    // async find(req, res) {
-    //     try {
-    //         const userService = new UserService();
-    //         const user = await userService.find(req.params.userId);
+//     async find(req, res) {
+//         try {
+//             const userService = new UserService();
+//             const user = await userService.find(req.params.userId);
 
-    //         return res.json(user)
-    //     } catch (error) {
-    //         res.json(error.message)
-    //     }
-    // }
+//             return res.json(user)
+//         } catch (error) {
+//             res.json(error.message)
+//         }
+//     }
 
-    // async search(req, res) {
-    //     try {
-    //         const userService = new UserService();
+//     async search(req, res) {
+//         try {
+//             const userService = new UserService();
 
-    //         return res.json(await userService.search(req.query))
-    //     } catch (error) {
-    //         return res.json(error.message)
-    //     }
-    // };
+//             return res.json(await userService.search(req.query))
+//         } catch (error) {
+//             return res.json(error.message)
+//         }
+//     };
     
-}
+// }
 
-export default UserController;
+// export default UserController;

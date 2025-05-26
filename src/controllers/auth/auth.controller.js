@@ -1,5 +1,5 @@
 import HttpError from "../../eceptions/httpError.eception.js";
-import { responseError, responseJsonByStatus, responseSuccess } from "../../helpers/helpers.js";
+import { responseError, responseJsonByStatus, responseSuccess, signHmac } from "../../helpers/helpers.js";
 import AuthService from "../../services/auth.service.js";
 import UserService from "../../services/user.service.js";
 import winston from "winston";
@@ -25,9 +25,16 @@ class AuthController {
             winston.loggers.get('user').info('user register')
             
             const newUser = req.body;
-            return responseJsonByStatus(res, responseSuccess(await AuthController.userService.store(newUser)), 200)
+            return responseJsonByStatus(
+                res, 
+                responseSuccess(await AuthController.userService.store(newUser), 200, 'Bạn đã đăng ký thành công, hãy đăng nhập '), 
+                200)
         } catch (error) {   
-            return responseJsonByStatus(res, responseError(error), 409)
+            return responseJsonByStatus(
+                res, 
+                responseError(error, 409, "Đăng ký không thành công, vui lòng thử lại"), 
+                409,
+            )
         }
     }
 
@@ -40,6 +47,21 @@ class AuthController {
             return responseJsonByStatus( res, responseError(error) );
         }
     }
+
+    async resetPassword(req, res) {
+        try {
+            winston.loggers.get('user').info('user reset password')
+
+            return responseJsonByStatus( res, responseSuccess(
+                await AuthController.authService.resetPassword( req.body.email ),
+                200,
+                'Reset Password thành công, vui lòng kiểm tra email và đăng nhập lại'
+            ))
+        } catch(error) {             
+            return responseJsonByStatus( res, responseError(error), 404 );
+        }
+    }
+    
 };
 
 export default AuthController;

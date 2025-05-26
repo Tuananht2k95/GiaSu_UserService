@@ -29,13 +29,10 @@ class BaseRepository {
         return this.getModel().findOne(conditions);
     }
 
-    findByIdAndUpdate(userId, data, authUser) {
-        data = {
-            ...data,
-            updateBy: authUser._id,
-        }
-        
-        return this.getModel().findByIdAndUpdate(userId, data, {new: true});
+    findByIdAndUpdate(userId, data, authUserId='') {
+        const newData = { ...data, updateBy: authUserId }
+                
+        return this.getModel().findByIdAndUpdate(userId, { $set: newData }, {new: true});
     }
 
     findByIdAndDelete(userId) {

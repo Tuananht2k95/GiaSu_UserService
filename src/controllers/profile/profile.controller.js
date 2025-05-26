@@ -28,18 +28,24 @@ class ProfileController {
             responseJsonByStatus(res, responseError(error.message), 500);
         }
     };
-
+   
     async updatePassword(req, res) {
-        try {            
-            const userId = req.authUser._id;            
-            const newPassword = signHmac(req.body.password, 'sha256');
+        try {
             winston.loggers.get('user').info(`user ${req.authUser._id} update password`);
 
-            return responseJsonByStatus(res, responseSuccess(await ProfileController.userService.update(userId, {password: newPassword})), 200);
+            const oldPassword = signHmac( req.body.oldPassword, 'sha256' );
+            const newPassword = signHmac( req.body.newPassword, 'sha256' );
+            
+            return responseJsonByStatus( 
+                res, 
+                responseSuccess( 
+                    await ProfileController.userService.updatePassword( req.authUser._id, oldPassword, newPassword )
+                    , 200
+                    , 'Thay đổi mật khẩu thành công' ))
         } catch (error) {
-            responseJsonByStatus(res, responseError(error.message), 500);
+            return responseJsonByStatus( res, responseError(error) );
         }
-    };
+    }
 
 }
 

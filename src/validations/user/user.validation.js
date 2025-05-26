@@ -4,6 +4,14 @@ import { USER } from "../../config/constant.js";
 import baseJoiValidate from "../base.validation.js"
 
 const Joi = BaseJoi.extend(JoiDate);
+const passwordSchema = Joi.string()
+    .max(255).min(6)
+    .pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/)
+    .required()
+    .messages({
+        "string.pattern.base": "Mật khẩu phải chứa chữ hoa, chữ thường và số",
+    });
+
 const validateUpdateUserSchema = Joi.object({
     name: Joi.string().max(255),
     gender: Joi.number().valid( USER.gender.female, USER.gender.male ),
@@ -19,16 +27,16 @@ const validateIndexUserSchema = Joi.object({
     role: Joi.number().valid( USER.role.admin, USER.role.teacher ),
 });
 const validateStoreUserSchema = Joi.object({
-    name: Joi.string().max(255).required(),
+    name: Joi.string().max(255),
     email: Joi.string().max(255).required().email(),
-    password: Joi.string().max(255).min(6).required(),
+    password: passwordSchema,
 });
 const validateUserIdSchema = Joi.object({
     userId: Joi.string().max(255).required(),
 });
 const validateLoginUserSchema = Joi.object({
     email: Joi.string().max(255).required().email(),
-    password: Joi.string().max(255).min(6).required(),
+    password: passwordSchema,
 });
 
 export const validateStoreUser = baseJoiValidate( validateStoreUserSchema );

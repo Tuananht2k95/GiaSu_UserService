@@ -7,5 +7,7 @@ const authController = new AuthController()
 
 authRouter.post('/login', validateLoginUser, authController.login);
 authRouter.post('/register', validateStoreUser, authController.register);
-authRouter.put('/confirmAccount', authController.confirmAccount)
+authRouter.patch('/confirmAccount', authController.confirmAccount);
+authRouter.post('/resetPassword', authController.resetPassword);
+
 export default authRouter;
