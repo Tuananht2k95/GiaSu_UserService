@@ -120,7 +120,7 @@ class AuthService {
                         {
                             key: 'email',
                             value: email,
-                            message: 'email không tồn tại trong DB',
+                            message: 'Email không tồn tại trong DB',
                         }
                     ]
                 }, 404
@@ -144,7 +144,7 @@ class AuthService {
             },
         );
 
-        return newUser;
+        return;
     }
    
 };
