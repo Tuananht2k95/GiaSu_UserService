@@ -141,6 +141,7 @@ class AuthService {
             '/emailResetPassword/emailResetPassword.ejs',
             {
                 newPassword: newPassword,
+                linkToLogin: process.env.FE_DOMAIN + '/auth/login'
             },
         );
 
